@@ -2,8 +2,8 @@
 //  Business.swift
 //  Yelp
 //
-//  Created by Timothy Lee on 4/23/15.
-//  Copyright (c) 2015 Timothy Lee. All rights reserved.
+//  Created by Luis Mendez on 9/21/18.
+//  Copyright (c) 2018 Luis Mendez. All rights reserved.
 //
 
 import UIKit
@@ -101,7 +101,7 @@ class Business: NSObject {
         }
         
         reviewCount = dictionary["review_count"] as? NSNumber
-    }
+    }//init
     
     class func businesses(array: [NSDictionary]) -> [Business] {
         var businesses = [Business]()
