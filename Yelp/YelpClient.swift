@@ -14,6 +14,8 @@ import BDBOAuth1Manager
 // You can register for Yelp API keys here: https://www.yelp.com/developers/v3/manage_app
 let yelpAPIKey = "izCFqEx0usiPwAiv_ymJ4Sl2Lr_mpnN6U_VeEkn1iUyEUWLM2Rd76A6NlswCI-HlYVWYT2WYRFtNnD04lgageyBKPJkqDDA75C8UsJYwc7oXWMGDFSCRU93zoTBaW3Yx"
 
+var offset: Int = 0//when network request is called
+
 enum YelpSortMode: String {
     case best_match, rating, review_count, distance
 }
@@ -44,8 +46,9 @@ class YelpClient: AFHTTPRequestOperationManager {
     func searchWithTerm(_ term: String, sort: YelpSortMode?, categories: [String]?, openNow: Bool?, completion: @escaping ([Business]?, Error?) -> Void) -> AFHTTPRequestOperation {
         // For additional parameters, see https://www.yelp.com/developers/documentation/v3/business_search
         
+        offset = offset+10//increment offset by 10 every time a new network request is called
         // Default the location to San Francisco
-        var parameters: [String : AnyObject] = ["term": term as AnyObject, "location": "37.785771,-122.406165" as AnyObject]
+        var parameters: [String : AnyObject] = ["term": term as AnyObject, "location": "37.785771,-122.406165" as AnyObject, "offset": offset as AnyObject]
         
         if sort != nil {
             parameters["sort_by"] = sort!.rawValue as AnyObject?
@@ -60,7 +63,7 @@ class YelpClient: AFHTTPRequestOperationManager {
         }
         
         print(parameters)
-        
+        print(self)
         return self.get("businesses/search", parameters: parameters,
                         success: { (operation: AFHTTPRequestOperation, response: Any) -> Void in
                             if let response = response as? [String: Any]{

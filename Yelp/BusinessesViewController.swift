@@ -8,12 +8,14 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate  {
+class BusinessesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UIScrollViewDelegate   {
     
     @IBOutlet weak var tableView: UITableView!
     
     var businesses: [Business]! = []
     var businessesSearched: [Business]! = []
+    
+    var isMoreDataLoading = false
     
     /*******************************************
      * UIVIEW CONTROLLER LIFECYCLES FUNCTIONS *
@@ -40,37 +42,49 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         // you just need to set the titleView to be the search bar
         navigationItem.titleView = searchBar
         
-        Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
-            
-                self.businesses = businesses
-                self.businessesSearched = businesses
-                self.tableView.reloadData()
-            
-                if let businesses = businesses {
-                    for business in businesses {
-                        print(business.name!)
-                        print(business.address!)
-                    }
-                }
-            
-            }
-        )
-        
-        /* Example of Yelp search with more search options specified
-         Business.searchWithTerm(term: "Restaurants", sort: .distance, categories: ["asianfusion", "burgers"]) { (businesses, error) in
-                self.businesses = businesses
-                 for business in self.businesses {
-                     print(business.name!)
-                     print(business.address!)
-                 }
-         }
-         */
-        
+        fetchData()
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func fetchData(){
+    
+        Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
+    
+            self.businesses = businesses
+            self.businessesSearched = businesses
+    
+            // Update flag after 2 seconds when scrolled using only offset because there is a
+            // change in the table when it reloads, there is a jumping table and it takes it
+            // as a scroll and calls fetchData again back to back, and table bounce is more pronounced
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { // change 2 to desired number of seconds
+                // Your code with delay
+                self.isMoreDataLoading = false
+            }
+            
+            self.tableView.reloadData()
+    
+            if let businesses = businesses {
+                for business in businesses {
+                print(business.name!)
+                print(business.address!)
+                }
+            }
+    
+        })
+        
+        /* Example of Yelp search with more search options specified
+         Business.searchWithTerm(term: "Restaurants", sort: .distance, categories: ["asianfusion", "burgers"]) { (businesses, error) in
+         self.businesses = businesses
+         for business in self.businesses {
+         print(business.name!)
+         print(business.address!)
+         }
+         }
+         */
     }
     
     /***********************
@@ -102,6 +116,10 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print("In searchbar searching")
+        
+        //while searching make this true so that it does not fetch unless searchText is empty
+        isMoreDataLoading = searchText.isEmpty ? false : true
+        
         // If we haven't typed anything into the search bar then do not filter the results
         // movies = searchedMovies otherwise/else filter searchedMovies
         businesses = searchText.isEmpty ? businessesSearched : businessesSearched.filter { ($0).name!.lowercased().contains(searchBar.text!.lowercased()) }//letter anywhere
@@ -109,6 +127,23 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         //movies = searchedMovies.filter { $0 == searchBar.text} //by whole words but who would do that lol
         
         tableView.reloadData()
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if (!isMoreDataLoading) {
+            // Calculate the position of one screen length before the bottom of the results
+            let scrollViewContentHeight = tableView.contentSize.height
+            let scrollOffsetThreshold = scrollViewContentHeight - (tableView.bounds.size.height-25)
+            
+            // When the user has scrolled past the threshold, start requesting
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.isDragging) {
+                
+                isMoreDataLoading = true
+                
+                // Code to load more results
+                fetchData()
+            }
+        }
     }
     
 }
