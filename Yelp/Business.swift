@@ -10,6 +10,7 @@ import UIKit
 
 class Business: NSObject {
     let name: String?
+    let coordinates: Dictionary<String, Double>?
     let address: String?
     let imageURL: URL?
     let categories: String?
@@ -19,6 +20,9 @@ class Business: NSObject {
     
     init(dictionary: NSDictionary) {
         name = dictionary["name"] as? String
+        
+        coordinates = dictionary["coordinates"] as? Dictionary<String, Double>
+        
         
         let imageURLString = dictionary["image_url"] as? String
         if imageURLString != nil {

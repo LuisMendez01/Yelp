@@ -79,6 +79,7 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
                 for business in businesses {
                 print(business.name!)
                 print(business.address!)
+                print(business.coordinates!)
                 }
             }
     

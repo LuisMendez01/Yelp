@@ -238,18 +238,28 @@
                                     <constraint firstItem="tRp-jS-Xvf" firstAttribute="top" secondItem="FLp-fL-EKO" secondAttribute="bottom" constant="8" id="x3Q-z5-U5r"/>
                                 </constraints>
                             </view>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ccx-TN-jNN">
+                                <rect key="frame" x="0.0" y="263" width="414" height="500"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="500" id="WAN-FU-0mJ"/>
+                                </constraints>
+                            </mapView>
                         </subviews>
                         <color key="backgroundColor" red="0.61568627450000002" green="0.67450980390000004" blue="0.74901960779999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="X0S-q7-PbF" firstAttribute="leading" secondItem="FDn-kg-dcq" secondAttribute="leading" id="AYR-bi-bCr"/>
+                            <constraint firstItem="Ccx-TN-jNN" firstAttribute="top" secondItem="X0S-q7-PbF" secondAttribute="bottom" id="DVk-Hs-Y1F"/>
                             <constraint firstAttribute="trailing" secondItem="X0S-q7-PbF" secondAttribute="trailing" id="F47-YP-L1o"/>
+                            <constraint firstAttribute="trailing" secondItem="Ccx-TN-jNN" secondAttribute="trailing" id="KXV-UE-F8w"/>
                             <constraint firstItem="X0S-q7-PbF" firstAttribute="top" secondItem="gB0-Fu-EgD" secondAttribute="bottom" id="tjb-Df-o2N"/>
+                            <constraint firstItem="Ccx-TN-jNN" firstAttribute="leading" secondItem="FDn-kg-dcq" secondAttribute="leading" id="uwN-wy-mei"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="address" destination="FLp-fL-EKO" id="SSd-KX-h1m"/>
                         <outlet property="categories" destination="tRp-jS-Xvf" id="7HV-rZ-vOu"/>
                         <outlet property="distance" destination="i4r-G6-LDw" id="LFc-yG-fhJ"/>
+                        <outlet property="mapView" destination="Ccx-TN-jNN" id="6uy-2u-H2a"/>
                         <outlet property="restoImage" destination="zKK-5c-CIc" id="wUv-Gy-Uxj"/>
                         <outlet property="restoName" destination="Y7b-hc-BNt" id="RhS-3g-bR5"/>
                         <outlet property="reviews" destination="Kl9-YH-NMQ" id="Pix-nS-tqK"/>

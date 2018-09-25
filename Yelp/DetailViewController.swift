@@ -8,8 +8,9 @@
 
 import UIKit
 import MapKit
+import CoreLocation
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var restoName: UILabel!
     @IBOutlet weak var distance: UILabel!
@@ -18,6 +19,9 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var categories: UILabel!
     @IBOutlet weak var stars: UIImageView!
     @IBOutlet weak var restoImage: UIImageView!
+    
+    @IBOutlet weak var mapView: MKMapView!
+    var locationManager : CLLocationManager!
     
     var business: Business! = nil
 
@@ -32,12 +36,43 @@ class DetailViewController: UIViewController {
         
         /*********set Labels and Images*******/
         setLablesAndImages()
+        
+        /*********Get any Location*******/
+        // set the region to display, this also sets a correct zoom level
+        // set starting at this center location
+        //let centerLocation = CLLocation(latitude: x, longitude: y)
+        //goToLocation(location: centerLocation)
+        
+        /*************Get current location plus use both location manager funcs below*****************/
+        
+        //default is San Francisco for simulator
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        locationManager.distanceFilter = 200
+        locationManager.requestWhenInUseAuthorization()
+        
+        /************Make an annotation with help of the annotation funcs below******/
+        if let coordinates = business.coordinates {
+            let latitude = coordinates["latitude"]!
+            let longitude = coordinates["longitude"]!
+            
+            let centerLocation2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            addAnnotationAtCoordinate(coordinate: centerLocation2D)
+        }
+        
       
     }
     
     /************************
      * My CREATED FUNCTIONS *
      ************************/
+    func goToLocation(location: CLLocation) {
+        let span = MKCoordinateSpanMake(0.1, 0.1)
+        let region = MKCoordinateRegionMake(location.coordinate, span)
+        mapView.setRegion(region, animated: false)
+    }
+    
     func setTitleBar(){
     
         let titleLabel = UILabel()//for the title of the page
@@ -75,6 +110,8 @@ class DetailViewController: UIViewController {
         stars.image =  business.ratingImage
         restoImage.setImageWith(business.imageURL!)
         
+        categories.sizeToFit() 
+        
     //"dfadfadfadfadfdfdfdfdfdfdfadfdfdffafafaffddfdafadfdfdfdfdfdfdfdfdfdfdafdafadfdfdfdfdfdfdfdfdfdfdsfdfdfdfddfadkllkhlkhlkhlkhlklhklkhlklklklklhkklklklklklklklklkjlklklklklklklklklklklklklklkllknnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn89"
         
         //having already set width of label as constraint
@@ -84,7 +121,55 @@ class DetailViewController: UIViewController {
         //such there is no a label next to it
         categories.preferredMaxLayoutWidth = categories.frame.size.width
         
-        restoImage.alpha = 0.3
+        restoImage.alpha = 0.4
 
+    }
+    
+    /***********************
+     * MKMapView FUNCTIONS *
+     ***********************/
+    
+    /**********get current location of user**************/
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == CLAuthorizationStatus.authorizedWhenInUse {
+            locationManager.startUpdatingLocation()
+        }
+        print("In getting permission")
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.first {
+            let span = MKCoordinateSpanMake(0.1, 0.1)
+            let region = MKCoordinateRegionMake(location.coordinate, span)
+            mapView.setRegion(region, animated: false)
+        }
+        
+        print("In getting location")
+    }
+    
+    /**********Add annotations**************/
+    // add an Annotation with a coordinate: CLLocationCoordinate2D
+    func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D) {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = business.name
+        mapView.addAnnotation(annotation)
+    }
+    
+    // add an annotation with an address: String
+    func addAnnotationAtAddress(address: String, title: String) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { (placemarks, error) in
+            if let placemarks = placemarks {
+                if placemarks.count != 0 {
+                    let coordinate = placemarks.first!.location!
+                    let annotation = MKPointAnnotation()
+                    annotation.coordinate = coordinate.coordinate
+                    annotation.title = title
+                    self.mapView.addAnnotation(annotation)
+                }
+            }
+        }
     }
 }
