@@ -48,11 +48,30 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "Search", style: .plain, target: nil, action: nil)
         
         fetchData()
+        
+        //create a new button
+        let button = UIButton.init(type: .custom)
+        //set image for button
+        button.setImage(UIImage(named: "map.png"), for: UIControl.State.normal)
+        //add function for button
+        button.addTarget(self, action: #selector(BusinessesViewController.goToMap), for: UIControl.Event.touchUpInside)
+        
+        let barButton = UIBarButtonItem(customView: button)
+        //assign button to navigationbar
+        self.navigationItem.rightBarButtonItem = barButton
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    /************************
+     * @OBJC FUNCTIONS *
+     ************************/
+    @objc func goToMap(_ sender: UIImage) {
+        print("segue to MapTrailerController")
+        performSegue(withIdentifier: "map", sender: nil)
     }
     
     /************************
@@ -144,6 +163,7 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
         if (!isMoreDataLoading) {
             // Calculate the position of one screen length before the bottom of the results
             let scrollViewContentHeight = tableView.contentSize.height
@@ -162,13 +182,23 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        // Get the index path from the cell that was tapped
-        let indexPath = tableView.indexPathForSelectedRow
-        // Get the Row of the Index Path and set as index
-        let index = indexPath?.row
-        // Get in touch with the DetailViewController
-        let detailViewController = segue.destination as! DetailViewController
-        // Pass on the data to the Detail ViewController by setting it's indexPathRow value
-        detailViewController.business = businesses[index!]
+        if segue.identifier == "map" {
+            
+            // Get in touch with the DetailViewController
+            let destinationVC = segue.destination as! MapViewController
+            // Pass on the data to the Detail ViewController by setting it's indexPathRow value
+            destinationVC.businesses = businesses
+            
+        } else {
+        
+            // Get the index path from the cell that was tapped
+            let indexPath = tableView.indexPathForSelectedRow
+            // Get the Row of the Index Path and set as index
+            let index = indexPath?.row
+            // Get in touch with the DetailViewController
+            let destinationVC = segue.destination as! DetailViewController
+            // Pass on the data to the Detail ViewController by setting it's indexPathRow value
+            destinationVC.business = businesses[index!]
+        }
     }
 }
