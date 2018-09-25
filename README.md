@@ -8,24 +8,27 @@ Time spent: **X** hours spent in total
 
 The following **required** functionality is completed:
 
-- [ ] Table rows for search results should be dynamic height according to the content height. (3pt)
-- [ ] Custom cells should have the proper Auto Layout constraints. (+5pt)
-- [ ] Search bar should be in the navigation bar (doesn't have to expand to show location like the real Yelp app does). (+2pt)
+- [x] Table rows for search results should be dynamic height according to the content height. (3pt)
+- [x] Custom cells should have the proper Auto Layout constraints. (+5pt)
+- [x] Search bar should be in the navigation bar (doesn't have to expand to show location like the real Yelp app does). (+2pt)
 
 The following **stretch** features are implemented:
 
-- [ ] Infinite scroll for restaurant results. (+3pt)
-- [ ] Implement map view of restaurant results. (+3pt)
-- [ ] Implement the restaurant detail page. (+2pt)
+- [x] Infinite scroll for restaurant results. (+3pt)
+- [x] Implement map view of restaurant results. (+3pt)
+- [x] Implement the restaurant detail page. (+2pt)
 
 The following **additional** features are implemented:
 
-- [ ] List anything else that you can get done to improve the app functionality!
+- [x] List anything else that you can get done to improve the app functionality!
+
+  1. I can implement a map behind a table view.
+  2. I can link a website to the business being searched.
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1.
-2.
+1. How to implement a MKMapView behind a tableView.
+2. How get the current location bar under the searchBar.
 
 ## Video Walkthrough
 
@@ -39,9 +42,12 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 Describe any challenges encountered while building the app.
 
+  1. Reading the code given to get started.
+  2. I can't follow code give 100%. 
+
 ## License
 
-Copyright [yyyy] [name of copyright owner]
+Copyright [2018] [Luis Mendez]
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
