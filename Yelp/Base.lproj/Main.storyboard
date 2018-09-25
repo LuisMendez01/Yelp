@@ -277,6 +277,17 @@
                                     <constraint firstAttribute="height" constant="500" id="WAN-FU-0mJ"/>
                                 </constraints>
                             </mapView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Website" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jxw-jB-xOC">
+                                <rect key="frame" x="156" y="785" width="102" height="42"/>
+                                <color key="backgroundColor" red="0.61568627450000002" green="0.67450980390000004" blue="0.74901960779999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="42" id="3jL-Sq-KbS"/>
+                                    <constraint firstAttribute="width" constant="102" id="U6D-IY-5gB"/>
+                                </constraints>
+                                <color key="textColor" red="0.0" green="0.32852089410000002" blue="0.57488495110000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="24"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" red="0.61568627450000002" green="0.67450980390000004" blue="0.74901960779999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -284,6 +295,8 @@
                             <constraint firstItem="Ccx-TN-jNN" firstAttribute="top" secondItem="X0S-q7-PbF" secondAttribute="bottom" id="DVk-Hs-Y1F"/>
                             <constraint firstAttribute="trailing" secondItem="X0S-q7-PbF" secondAttribute="trailing" id="F47-YP-L1o"/>
                             <constraint firstAttribute="trailing" secondItem="Ccx-TN-jNN" secondAttribute="trailing" id="KXV-UE-F8w"/>
+                            <constraint firstItem="Jxw-jB-xOC" firstAttribute="centerX" secondItem="FDn-kg-dcq" secondAttribute="centerX" id="XF1-M9-V9i"/>
+                            <constraint firstItem="Jxw-jB-xOC" firstAttribute="top" secondItem="Ccx-TN-jNN" secondAttribute="bottom" constant="22" id="cdB-4s-9FS"/>
                             <constraint firstItem="X0S-q7-PbF" firstAttribute="top" secondItem="gB0-Fu-EgD" secondAttribute="bottom" id="tjb-Df-o2N"/>
                             <constraint firstItem="Ccx-TN-jNN" firstAttribute="leading" secondItem="FDn-kg-dcq" secondAttribute="leading" id="uwN-wy-mei"/>
                         </constraints>
@@ -292,6 +305,7 @@
                         <outlet property="address" destination="FLp-fL-EKO" id="SSd-KX-h1m"/>
                         <outlet property="categories" destination="tRp-jS-Xvf" id="7HV-rZ-vOu"/>
                         <outlet property="distance" destination="i4r-G6-LDw" id="LFc-yG-fhJ"/>
+                        <outlet property="linkTextView" destination="Jxw-jB-xOC" id="lzP-HK-lLJ"/>
                         <outlet property="mapView" destination="Ccx-TN-jNN" id="6uy-2u-H2a"/>
                         <outlet property="restoImage" destination="zKK-5c-CIc" id="wUv-Gy-Uxj"/>
                         <outlet property="restoName" destination="Y7b-hc-BNt" id="RhS-3g-bR5"/>

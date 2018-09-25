@@ -21,10 +21,11 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var restoImage: UIImageView!
     
     @IBOutlet weak var mapView: MKMapView!
-    var locationManager : CLLocationManager!
     
+    var locationManager : CLLocationManager!
     var business: Business! = nil
-
+    @IBOutlet weak var linkTextView: UITextView!
+    
     /*******************************************
      * UIVIEW CONTROLLER LIFECYCLES FUNCTIONS *
      *******************************************/
@@ -60,6 +61,17 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
             let centerLocation2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             addAnnotationAtCoordinate(coordinate: centerLocation2D)
         }
+        
+        // Do any additional setup after loading the view, typically from a nib.
+        let string = "Website"
+        let largeAttributes = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 24)]
+        let linkString = NSMutableAttributedString(string: string, attributes: largeAttributes)
+        linkString.addAttribute(NSAttributedStringKey.link, value: NSURL(string: "https://www.google.com")!, range: NSMakeRange(0, string.count))
+        //linkString.addAttribute(NSAttributedStringKey.font, value: UIFont(name: "HelveticaNeue", size: 22.0)!, range: NSMakeRange(0, string.count))
+
+        linkTextView.attributedText = linkString
+        linkTextView.isSelectable = true
+        linkTextView.isUserInteractionEnabled = true
         
       
     }
@@ -109,17 +121,6 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
         categories.text = business.categories
         stars.image =  business.ratingImage
         restoImage.setImageWith(business.imageURL!)
-        
-        categories.sizeToFit() 
-        
-    //"dfadfadfadfadfdfdfdfdfdfdfadfdfdffafafaffddfdafadfdfdfdfdfdfdfdfdfdfdafdafadfdfdfdfdfdfdfdfdfdfdsfdfdfdfddfadkllkhlkhlkhlkhlklhklkhlklklklklhkklklklklklklklklkjlklklklklklklklklklklklklklkllknnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn89"
-        
-        //having already set width of label as constraint
-        //we can use MaxLayoutWidth to make text wrap around
-        //having set lines to 0 and line break to word wrap
-        //if and only if trailing constraint was not set in cases
-        //such there is no a label next to it
-        categories.preferredMaxLayoutWidth = categories.frame.size.width
         
         restoImage.alpha = 0.4
 
