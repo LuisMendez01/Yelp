@@ -42,6 +42,11 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         // you just need to set the titleView to be the search bar
         navigationItem.titleView = searchBar
         
+        /*********Title Back Button Bar*******/
+        //Change the back button of this nav bar to "Search" coz title of
+        //this nav bar is "UISearchBar ..." and it's too long to be a back btn
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "Search", style: .plain, target: nil, action: nil)
+        
         fetchData()
     }
     
@@ -50,6 +55,9 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         // Dispose of any resources that can be recreated.
     }
     
+    /************************
+     * MY CREATED FUNCTIONS *
+     ************************/
     func fetchData(){
     
         Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
@@ -114,6 +122,11 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //Change the selected background of the view of the selected cell.
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print("In searchbar searching")
         
@@ -146,4 +159,15 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        // Get the index path from the cell that was tapped
+        let indexPath = tableView.indexPathForSelectedRow
+        // Get the Row of the Index Path and set as index
+        let index = indexPath?.row
+        // Get in touch with the DetailViewController
+        let detailViewController = segue.destination as! DetailViewController
+        // Pass on the data to the Detail ViewController by setting it's indexPathRow value
+        detailViewController.business = businesses[index!]
+    }
 }

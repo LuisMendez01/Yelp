@@ -37,20 +37,11 @@ class BusinessViewCell: UITableViewCell {
         thumbImageView.clipsToBounds = true
         thumbImageView.layer.cornerRadius = 5
         
-        //having already set width of label as constraint
-        //we can use MaxLayoutWidth to make text wrap around
-        //having set lines to 0 and line break to word wrap
-        //if and only if trailing constraint was not set in cases
-        //such there is no a label next to it
-        restaurantLabel.preferredMaxLayoutWidth = restaurantLabel.frame.size.width
-        
         distanceLabel.preferredMaxLayoutWidth = distanceLabel.frame.size.width
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
 
 }
