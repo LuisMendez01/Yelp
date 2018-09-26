@@ -26,13 +26,15 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         tableView.delegate = self
         tableView.dataSource = self
         
+        
+        tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 10
         
         // create the search bar programatically since you won't be
         // able to drag one onto the navigation bar
         let searchBar = UISearchBar()
         searchBar.sizeToFit()
+        searchBar.searchBarStyle = .minimal
         
         searchBar.delegate = self
         
@@ -97,8 +99,8 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
             if let businesses = businesses {
                 for business in businesses {
                 print(business.name!)
-                print(business.address!)
-                print(business.coordinates!)
+                //print(business.address!)
+                //print(business.coordinates!)
                 }
             }
     

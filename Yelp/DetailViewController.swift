@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class DetailViewController: UIViewController, CLLocationManagerDelegate {
+class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
     @IBOutlet weak var restoName: UILabel!
     @IBOutlet weak var distance: UILabel!
@@ -38,6 +38,9 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
         /*********set Labels and Images*******/
         setLablesAndImages()
         
+        // 1. to draw path from current to pin
+        mapView.delegate = self
+        
         /*********Get any Location*******/
         // set the region to display, this also sets a correct zoom level
         // set starting at this center location
@@ -49,7 +52,7 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
         //default is San Francisco for simulator
         locationManager = CLLocationManager()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest//kCLLocationAccuracyNearestTenMeters
         locationManager.distanceFilter = 200
         locationManager.requestWhenInUseAuthorization()
         
@@ -60,25 +63,63 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
             
             let centerLocation2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             addAnnotationAtCoordinate(coordinate: centerLocation2D)
+            
+            // 1. Get destination location
+            let destinationLocation = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            // 2. Get the placemark
+            let destinationPlacemark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
+            
+            // 3. Get the destination item
+            let destinationMapItem = MKMapItem(placemark: destinationPlacemark)
+            
+            //Get directions and path from point A to B
+            let request = MKDirectionsRequest()
+            request.source = MKMapItem.forCurrentLocation()
+            request.destination = destinationMapItem//first 3 steps go here
+            request.requestsAlternateRoutes = false
+            
+            let directions = MKDirections(request: request)
+            
+            directions.calculate(completionHandler: {(response, error) in
+                
+                if error != nil {
+                    print("Error getting directions")
+                } else {
+                    self.showRoute(response!)
+                }
+            })
+            
         }
         
         // Do any additional setup after loading the view, typically from a nib.
         let string = "Website"
         let largeAttributes = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 24)]
         let linkString = NSMutableAttributedString(string: string, attributes: largeAttributes)
-        linkString.addAttribute(NSAttributedStringKey.link, value: NSURL(string: "https://www.google.com")!, range: NSMakeRange(0, string.count))
+        linkString.addAttribute(NSAttributedStringKey.link, value: NSURL(string: business.websiteURL!)!, range: NSMakeRange(0, string.count))
         //linkString.addAttribute(NSAttributedStringKey.font, value: UIFont(name: "HelveticaNeue", size: 22.0)!, range: NSMakeRange(0, string.count))
 
         linkTextView.attributedText = linkString
         linkTextView.isSelectable = true
         linkTextView.isUserInteractionEnabled = true
         
-      
     }
     
     /************************
      * My CREATED FUNCTIONS *
      ************************/
+    func showRoute(_ response: MKDirectionsResponse) {
+        
+        for route in response.routes {
+            
+            mapView.add(route.polyline,
+                         level: MKOverlayLevel.aboveRoads)
+            for step in route.steps {
+                print(step.instructions)
+            }
+        }
+    }
+    
     func goToLocation(location: CLLocation) {
         let span = MKCoordinateSpanMake(0.1, 0.1)
         let region = MKCoordinateRegionMake(location.coordinate, span)
@@ -122,7 +163,7 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
         stars.image =  business.ratingImage
         restoImage.setImageWith(business.imageURL!)
         
-        restoImage.alpha = 0.4
+        restoImage.alpha = 0.3
 
     }
     
@@ -131,7 +172,6 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
      ***********************/
     
     /**********get current location of user**************/
-    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == CLAuthorizationStatus.authorizedWhenInUse {
             locationManager.startUpdatingLocation()
@@ -141,7 +181,7 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
-            let span = MKCoordinateSpanMake(0.1, 0.1)
+            let span = MKCoordinateSpanMake(0.01, 0.01)
             let region = MKCoordinateRegionMake(location.coordinate, span)
             mapView.setRegion(region, animated: false)
         }
@@ -173,4 +213,83 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate {
             }
         }
     }
+
+    /*
+     * This function allows path from point A to B to show
+     */
+    func mapView(_ mapView: MKMapView, rendererFor
+        overlay: MKOverlay) -> MKOverlayRenderer {
+        
+        let renderer = MKPolylineRenderer(overlay: overlay)
+        renderer.strokeColor = UIColor.purple
+        renderer.lineWidth = 2.0
+        return renderer
+    }
 }
+
+/*
+ override func viewDidLoad() {
+ super.viewDidLoad()
+ 
+ // 1.
+ mapView.delegate = self
+ 
+ // 2.
+ let sourceLocation = CLLocationCoordinate2D(latitude: 40.759011, longitude: -73.984472)
+ let destinationLocation = CLLocationCoordinate2D(latitude: 40.748441, longitude: -73.985564)
+ 
+ // 3.
+ let sourcePlacemark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)
+ let destinationPlacemark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
+ 
+ // 4.
+ let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
+ let destinationMapItem = MKMapItem(placemark: destinationPlacemark)
+ 
+ // 5.
+ let sourceAnnotation = MKPointAnnotation()
+ sourceAnnotation.title = "Times Square"
+ 
+ if let location = sourcePlacemark.location {
+ sourceAnnotation.coordinate = location.coordinate
+ }
+ 
+ 
+ let destinationAnnotation = MKPointAnnotation()
+ destinationAnnotation.title = "Empire State Building"
+ 
+ if let location = destinationPlacemark.location {
+ destinationAnnotation.coordinate = location.coordinate
+ }
+ 
+ // 6.
+ self.mapView.showAnnotations([sourceAnnotation,destinationAnnotation], animated: true )
+ 
+ // 7.
+ let directionRequest = MKDirectionsRequest()
+ directionRequest.source = sourceMapItem
+ directionRequest.destination = destinationMapItem
+ directionRequest.transportType = .Automobile
+ 
+ // Calculate the direction
+ let directions = MKDirections(request: directionRequest)
+ 
+ // 8.
+ directions.calculateDirectionsWithCompletionHandler {
+ (response, error) -> Void in
+ 
+ guard let response = response else {
+ if let error = error {
+ print("Error: \(error)")
+ }
+ 
+ return
+ }
+ 
+ let route = response.routes[0]
+ self.mapView.addOverlay((route.polyline), level: MKOverlayLevel.AboveRoads)
+ 
+ let rect = route.polyline.boundingMapRect
+ self.mapView.setRegion(MKCoordinateRegionForMapRect(rect), animated: true)
+ }
+ }*/

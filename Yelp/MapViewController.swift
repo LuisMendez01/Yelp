@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class MapViewController: UIViewController, CLLocationManagerDelegate {
+class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
     var businesses: [Business]! = []
     var locationManager : CLLocationManager!
@@ -25,6 +25,17 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         
         /*********Title In Nav Bar*******/
         setTitleBar()
+        
+        /*********To be able to call its functions*******/
+        mapView.delegate = self
+        
+        //default is San Francisco for simulator
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters//kCLLocationAccuracyBest
+        // Set a movement threshold for new events.
+        locationManager.distanceFilter = 200
+        locationManager.requestWhenInUseAuthorization()
 
         //self.view.frame.size.width = self.view.frame.size.width - 60
         //self.revealViewController().rearViewRevealWidth = self.view.frame.size.width - 60
@@ -38,7 +49,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
      * My CREATED FUNCTIONS *
      ************************/
     func goToLocation(location: CLLocation) {
-        let span = MKCoordinateSpanMake(0.1, 0.1)
+        let span = MKCoordinateSpanMake(0.05, 0.05)
         let region = MKCoordinateRegionMake(location.coordinate, span)
         mapView.setRegion(region, animated: false)
     }
@@ -69,15 +80,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         titleLabel.sizeToFit()
         navigationItem.titleView = titleLabel
         
-        //default is San Francisco for simulator
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters//kCLLocationAccuracyBest
-        locationManager.distanceFilter = 200
-        locationManager.requestWhenInUseAuthorization()
-        
         setAllBusinessesPins()
-        
         
     }
     
@@ -95,7 +98,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                     let centerLocation2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                     addAnnotationAtCoordinate(coordinate: centerLocation2D, name: business.name!)
                     
-                    
                     print(business.name!)
                     print(business.coordinates!)
                 }
@@ -106,6 +108,59 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     /************************
      * MKMapView FUNCTIONS *
      ************************/
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        if annotation is MKUserLocation {
+            //return nil so map view draws "blue dot" for standard user location
+            return nil
+        }
+        
+        let identifier = "customAnnotationView"
+        // custom pin annotation
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKPinAnnotationView
+        if (annotationView == nil) {
+            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView!.canShowCallout = true
+            annotationView!.animatesDrop = true
+            annotationView!.pinTintColor = .green
+        }
+        else {
+            annotationView!.annotation = annotation
+        }
+        annotationView!.pinTintColor = UIColor.purple
+        
+        return annotationView
+    }
+    /*
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        // Don't want to show a custom image if the annotation is the user's location.
+        guard !(annotation is MKUserLocation) else {
+            return nil
+        }
+        
+        // Better to make this class property
+        let annotationIdentifier = "AnnotationIdentifier"
+        
+        var annotationView: MKAnnotationView?
+        if let dequeuedAnnotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationIdentifier) {
+            annotationView = dequeuedAnnotationView
+            annotationView?.annotation = annotation
+        }
+        else {
+            let av = MKAnnotationView(annotation: annotation, reuseIdentifier: annotationIdentifier)
+            av.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+            annotationView = av
+        }
+        
+        if let annotationView = annotationView {
+            // Configure your annotation view here
+            annotationView.canShowCallout = true
+            annotationView.image = UIImage(named: "map.png")
+        }
+        
+        return annotationView
+    }
+    */
     // add an Annotation with a coordinate: CLLocationCoordinate2D
     func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D, name: String) {
         let annotation = MKPointAnnotation()
@@ -142,12 +197,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
-            let span = MKCoordinateSpanMake(0.03, 0.02)
+            let span = MKCoordinateSpanMake(0.03, 0.04)
             let region = MKCoordinateRegionMake(location.coordinate, span)
             mapView.setRegion(region, animated: false)
         }
         
         print("In getting location")
     }
-
+    
 }
