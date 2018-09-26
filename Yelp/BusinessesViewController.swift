@@ -35,6 +35,7 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         let searchBar = UISearchBar()
         searchBar.sizeToFit()
         searchBar.searchBarStyle = .minimal
+        searchBar.becomeFirstResponder()
         
         searchBar.delegate = self
         
