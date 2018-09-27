@@ -44,19 +44,24 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         /*********Get any Location*******/
         // set the region to display, this also sets a correct zoom level
         // set starting at this center location
-        //let centerLocation = CLLocation(latitude: x, longitude: y)
-        //goToLocation(location: centerLocation)
+            //let centerLocation = CLLocation(latitude: x, longitude: y)
+            //goToLocation(location: centerLocation)
         
-        /*************Get current location plus use both location manager funcs below*****************/
-        
-        //default is San Francisco for simulator
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest//kCLLocationAccuracyNearestTenMeters
-        locationManager.distanceFilter = 200
-        locationManager.requestWhenInUseAuthorization()
+        /*********Get user's location*******/
+        getCurrentLocation()
         
         /************Make an annotation with help of the annotation funcs below******/
+        getAnnotations()
+        
+        /*********Get user's location*******/
+        getWebsiteLink()
+    }
+    
+    /************************
+     * My CREATED FUNCTIONS *
+     ************************/
+    func getAnnotations(){
+        
         if let coordinates = business.coordinates {
             let latitude = coordinates["latitude"]!
             let longitude = coordinates["longitude"]!
@@ -89,25 +94,9 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
                     self.showRoute(response!)
                 }
             })
-            
         }
-        
-        // Do any additional setup after loading the view, typically from a nib.
-        let string = "Website"
-        let largeAttributes = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 24)]
-        let linkString = NSMutableAttributedString(string: string, attributes: largeAttributes)
-        linkString.addAttribute(NSAttributedStringKey.link, value: NSURL(string: business.websiteURL!)!, range: NSMakeRange(0, string.count))
-        //linkString.addAttribute(NSAttributedStringKey.font, value: UIFont(name: "HelveticaNeue", size: 22.0)!, range: NSMakeRange(0, string.count))
-
-        linkTextView.attributedText = linkString
-        linkTextView.isSelectable = true
-        linkTextView.isUserInteractionEnabled = true
-        
     }
-    
-    /************************
-     * My CREATED FUNCTIONS *
-     ************************/
+        
     func showRoute(_ response: MKDirectionsResponse) {
         
         for route in response.routes {
@@ -117,6 +106,24 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
             for step in route.steps {
                 print(step.instructions)
             }
+        }
+    }
+    
+    func getCurrentLocation(){
+        
+        //default is San Francisco for simulator
+        locationManager = CLLocationManager()
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.requestAlwaysAuthorization()
+            locationManager.requestWhenInUseAuthorization()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters//kCLLocationAccuracyBest
+            
+            // Set a movement threshold for new events.
+            locationManager.distanceFilter = 200
+            //mapView.showsUserLocation = true//this work in this VC when hidden but
+            //in MapViewVC does not work hidden, it needs to be set
         }
     }
     
@@ -138,12 +145,6 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
             .font : UIFont.boldSystemFont(ofSize: 17)
         ]
         
-        //titleLabel.frame = CGRect(x:0, y:0, width:50, height:60)
-        //titleLabel.center = CGPoint(x: 380/2, y: 245)
-        //titleLabel.numberOfLines = 0
-        //titleLabel.lineBreakMode = .byWordWrapping
-        //titleLabel.preferredMaxLayoutWidth = titleLabel.frame.size.width
-        
         //set the name and put in the attributes for it
         let titleText = NSAttributedString(string: business.name!, attributes: strokeTextAttributes)
         
@@ -151,6 +152,20 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
         titleLabel.attributedText = titleText
         titleLabel.sizeToFit()
         navigationItem.titleView = titleLabel
+    }
+    
+    func getWebsiteLink(){
+        
+        // Do any additional setup after loading the view, typically from a nib.
+        let string = "Website"
+        let largeAttributes = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 24)]
+        let linkString = NSMutableAttributedString(string: string, attributes: largeAttributes)
+        linkString.addAttribute(NSAttributedStringKey.link, value: NSURL(string: business.websiteURL!)!, range: NSMakeRange(0, string.count))
+        //linkString.addAttribute(NSAttributedStringKey.font, value: UIFont(name: "HelveticaNeue", size: 22.0)!, range: NSMakeRange(0, string.count))
+        
+        linkTextView.attributedText = linkString
+        linkTextView.isSelectable = true
+        linkTextView.isUserInteractionEnabled = true
     }
     
     func setLablesAndImages() {
@@ -171,7 +186,7 @@ class DetailViewController: UIViewController, CLLocationManagerDelegate, MKMapVi
      * MKMapView FUNCTIONS *
      ***********************/
     
-    /**********get current location of user**************/
+    /*******get auth of user and give span for coordinates of user's current location**********/
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == CLAuthorizationStatus.authorizedWhenInUse {
             locationManager.startUpdatingLocation()
