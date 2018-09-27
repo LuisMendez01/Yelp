@@ -29,13 +29,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         /*********To be able to call its functions*******/
         mapView.delegate = self
         
-        //default is San Francisco for simulator
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters//kCLLocationAccuracyBest
-        // Set a movement threshold for new events.
-        locationManager.distanceFilter = 200
-        locationManager.requestWhenInUseAuthorization()
+        /*********Get user's location*******/
+        getCurrentLocation()
+        
+        /*********Set All Businesses*******/
+        setAllBusinessesPins()
 
         //self.view.frame.size.width = self.view.frame.size.width - 60
         //self.revealViewController().rearViewRevealWidth = self.view.frame.size.width - 60
@@ -48,6 +46,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     /************************
      * My CREATED FUNCTIONS *
      ************************/
+    func getCurrentLocation(){
+        
+        //default is San Francisco for simulator
+        locationManager = CLLocationManager()
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.requestAlwaysAuthorization()
+            locationManager.requestWhenInUseAuthorization()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters//kCLLocationAccuracyBest
+            
+            // Set a movement threshold for new events.
+            locationManager.distanceFilter = 200
+            mapView.showsUserLocation = true
+        }
+    }
+    
     func goToLocation(location: CLLocation) {
         let span = MKCoordinateSpanMake(0.05, 0.05)
         let region = MKCoordinateRegionMake(location.coordinate, span)
@@ -66,12 +81,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             .font : UIFont.boldSystemFont(ofSize: 17)
         ]
         
-        //titleLabel.frame = CGRect(x:0, y:0, width:50, height:60)
-        //titleLabel.center = CGPoint(x: 380/2, y: 245)
-        //titleLabel.numberOfLines = 0
-        //titleLabel.lineBreakMode = .byWordWrapping
-        //titleLabel.preferredMaxLayoutWidth = titleLabel.frame.size.width
-        
         //set the name and put in the attributes for it
         let titleText = NSAttributedString(string: "Businesses", attributes: strokeTextAttributes)
         
@@ -79,8 +88,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         titleLabel.attributedText = titleText
         titleLabel.sizeToFit()
         navigationItem.titleView = titleLabel
-        
-        setAllBusinessesPins()
         
     }
     
@@ -108,6 +115,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     /************************
      * MKMapView FUNCTIONS *
      ************************/
+    /**********Custome annotations**************/
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
         if annotation is MKUserLocation {
@@ -161,6 +169,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         return annotationView
     }
     */
+    /**********Add annotations for businesses by coordinates or address**************/
     // add an Annotation with a coordinate: CLLocationCoordinate2D
     func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D, name: String) {
         let annotation = MKPointAnnotation()
@@ -186,8 +195,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         }
     }
     
-    /**********get current location of user**************/
-    
+    /**********Ask user to allow location and set span for coordinates on 2nd func**************/
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == CLAuthorizationStatus.authorizedWhenInUse {
             locationManager.startUpdatingLocation()
